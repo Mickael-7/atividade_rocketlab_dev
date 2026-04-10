@@ -137,3 +137,32 @@ dist
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# Vite build output
+frontend/dist/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+
+# Virtual environments
+backend/.venv/
+.venv/
+env/
+venv/
+
+# SQLite database
+backend/database.db
+
+# Python dotenv
+backend/.env
+
+# Alembic
+backend/alembic/versions/__pycache__/
+
+# OS
+.DS_Store
+Thumbs.db
