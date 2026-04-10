@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 
 from sqlalchemy import String, Float
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -17,3 +17,4 @@ class Produto(Base):
     altura_centimetros: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
     largura_centimetros: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
 
+    itens_pedidos: Mapped[List["ItemPedido"]] = relationship("ItemPedido", back_populates="produto", cascade="all, delete-orphan")
