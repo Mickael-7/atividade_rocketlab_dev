@@ -25,7 +25,7 @@ Aplicação fullstack para gerenciamento de produtos de e-commerce, com catálog
 ### 1. Clone o repositório
 
 ```bash
-git clone <url-do-repositorio>
+git clone https://github.com/Mickael-7/atividade_rocketlab_dev.git
 cd atividade_rocketlab_dev
 ```
 
