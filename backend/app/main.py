@@ -1,7 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routers import produtos, categorias
+from app.config import settings
+from app.routers import produtos, categorias, dashboard, vendedores, pedidos, consumidores, avaliacoes
 
 app = FastAPI(
     title="Sistema de Gerenciamento de E-Commerce",
@@ -11,7 +12,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:5174"],
+    allow_origins=settings.ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -19,6 +20,11 @@ app.add_middleware(
 
 app.include_router(produtos.router)
 app.include_router(categorias.router)
+app.include_router(dashboard.router)
+app.include_router(vendedores.router)
+app.include_router(pedidos.router)
+app.include_router(consumidores.router)
+app.include_router(avaliacoes.router)
 
 
 @app.get("/", tags=["Health"])

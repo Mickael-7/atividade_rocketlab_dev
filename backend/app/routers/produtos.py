@@ -52,6 +52,8 @@ def listar_produtos(
     limit: int = Query(20, ge=1, le=100),
     busca: str = Query("", alias="busca"),
     categoria: str = Query("", alias="categoria"),
+    ordenar: str = Query("", alias="ordenar"),
+    avaliacao_min: int = Query(0, ge=0, le=5, alias="avaliacao_min"),
     db: Session = Depends(get_db),
 ):
     query = select(Produto)
@@ -61,6 +63,41 @@ def listar_produtos(
 
     if categoria.strip():
         query = query.where(Produto.categoria_produto == categoria.strip())
+
+    if avaliacao_min > 0:
+        aval_filter_sq = (
+            select(ItemPedido.id_produto)
+            .join(AvaliacaoPedido, AvaliacaoPedido.id_pedido == ItemPedido.id_pedido)
+            .group_by(ItemPedido.id_produto)
+            .having(func.avg(AvaliacaoPedido.avaliacao) >= avaliacao_min)
+            .subquery()
+        )
+        query = query.join(aval_filter_sq, Produto.id_produto == aval_filter_sq.c.id_produto)
+
+    if ordenar == "nome_asc":
+        query = query.order_by(Produto.nome_produto.asc())
+    elif ordenar == "nome_desc":
+        query = query.order_by(Produto.nome_produto.desc())
+    elif ordenar == "mais_vendidos":
+        vendas_sq = (
+            select(ItemPedido.id_produto, func.count(ItemPedido.id_item).label("total_vendas"))
+            .group_by(ItemPedido.id_produto)
+            .subquery()
+        )
+        query = query.outerjoin(vendas_sq, Produto.id_produto == vendas_sq.c.id_produto)
+        query = query.order_by(func.coalesce(vendas_sq.c.total_vendas, 0).desc())
+    elif ordenar == "avaliacao_desc":
+        aval_sq = (
+            select(
+                ItemPedido.id_produto,
+                func.avg(AvaliacaoPedido.avaliacao).label("media_aval"),
+            )
+            .join(AvaliacaoPedido, AvaliacaoPedido.id_pedido == ItemPedido.id_pedido)
+            .group_by(ItemPedido.id_produto)
+            .subquery()
+        )
+        query = query.outerjoin(aval_sq, Produto.id_produto == aval_sq.c.id_produto)
+        query = query.order_by(func.coalesce(aval_sq.c.media_aval, 0).desc())
 
     total = db.execute(select(func.count()).select_from(query.subquery())).scalar_one()
 
@@ -137,6 +174,7 @@ def detalhar_produto(id_produto: str, db: Session = Depends(get_db)):
                 titulo_comentario=a.titulo_comentario,
                 comentario=a.comentario,
                 data_comentario=a.data_comentario.isoformat() if a.data_comentario else None,
+                resposta_gerente=a.resposta_gerente,
             )
             for a in avals_list
         ],

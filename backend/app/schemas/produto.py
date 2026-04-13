@@ -51,6 +51,7 @@ class AvaliacaoItem(BaseModel):
     titulo_comentario: Optional[str]
     comentario: Optional[str]
     data_comentario: Optional[str]
+    resposta_gerente: Optional[str] = None
 
 
 class AvaliacaoStats(BaseModel):

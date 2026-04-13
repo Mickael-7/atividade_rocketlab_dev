@@ -1,6 +1,6 @@
 # Sistema de Gerenciamento de E-Commerce
 
-Aplicação fullstack para gerenciamento de produtos de e-commerce, com catálogo, detalhes de vendas, avaliações e CRUD completo.
+Aplicação fullstack para gerenciamento de produtos, pedidos, consumidores, vendedores e análise de desempenho de vendas.
 
 ## Stack
 
@@ -34,17 +34,20 @@ cd atividade_rocketlab_dev
 ```bash
 cd backend
 
-# Criar e ativar o ambiente virtual
+# Criar o ambiente virtual
 python -m venv .venv
 
-# Windows
+# Ativar — Windows
 .venv\Scripts\activate
 
-# Linux / macOS
+# Ativar — Linux / macOS
 source .venv/bin/activate
 
 # Instalar dependências
 pip install -r requirements.txt
+
+# Copiar variáveis de ambiente
+cp .env.example .env
 
 # Rodar as migrações (cria o banco de dados)
 alembic upgrade head
@@ -56,7 +59,7 @@ python -m app.seed
 uvicorn app.main:app --reload --port 8000
 ```
 
-> A documentação interativa da API estará disponível em: http://localhost:8000/docs
+A documentação interativa da API estará disponível em: http://localhost:8000/docs
 
 ### 3. Frontend
 
@@ -72,7 +75,15 @@ npm install
 npm run dev
 ```
 
-> Acesse a aplicação em: http://localhost:5173
+Acesse a aplicação em: http://localhost:5173
+
+### 4. Testes automatizados (opcional)
+
+Com o ambiente virtual ativo, a partir da pasta `backend/`:
+
+```bash
+pytest
+```
 
 ---
 
@@ -80,10 +91,9 @@ npm run dev
 
 ### Backend (`backend/.env`)
 
-Opcional — o padrão já funciona sem configuração:
-
 ```env
 DATABASE_URL=sqlite:///./database.db
+ALLOWED_ORIGINS=["http://localhost:5173","http://localhost:5174"]
 ```
 
 ### Frontend (`frontend/.env.local`)
@@ -100,10 +110,11 @@ VITE_API_URL=http://localhost:8000
 
 ### Catálogo de Produtos (`/`)
 - Grid responsivo com imagem representativa da categoria
-- Busca por nome com debounce (sem recarregar a página)
-- Filtro por categoria
-- Paginação com navegação por ellipsis
+- Busca por nome com debounce e sincronização com URL
+- Filtro por categoria e avaliação mínima (estrelas)
+- Ordenação por nome, mais vendidos e melhor avaliados
 - Média de avaliações exibida em cada card
+- Paginação com navegação por ellipsis
 
 ### Detalhe do Produto (`/produtos/:id`)
 - Especificações: peso, comprimento, altura e largura
@@ -114,8 +125,35 @@ VITE_API_URL=http://localhost:8000
 ### Gerenciamento de Produtos
 - Cadastrar novo produto (`/produtos/novo`)
 - Editar produto existente (`/produtos/:id/editar`)
-- Validação de campos no frontend
-- Feedback visual de carregamento e erros inline
+- Validação de campos e feedback visual de erros
+
+### Pedidos (`/pedidos`)
+- Listagem paginada com filtro por status
+- Badge colorido por status (entregue, cancelado, em processamento…)
+- Página de detalhe com itens do pedido, avaliações e informações do consumidor
+
+### Consumidores (`/consumidores`)
+- Listagem paginada com busca por nome
+- Página de perfil com histórico de pedidos e estatísticas
+
+### Vendedores (`/vendedores`)
+- Listagem paginada ordenada por receita
+- Exportação para CSV
+
+### Dashboard (`/dashboard`)
+- KPIs: total de pedidos, receita total, ticket médio e % de entregas no prazo
+- Gráfico de linha: pedidos por mês
+- Gráfico de pizza: distribuição de status dos pedidos
+- Top 5 produtos mais vendidos (com link para detalhe)
+- Receita por estado do vendedor (barras proporcionais)
+- Indicador de pontualidade de entrega
+- Exportação dos top produtos para CSV
+
+### Outros recursos
+- Notificações toast em erros e ações (sonner)
+- Interceptor global de erros HTTP (Axios)
+- Caching de consultas com TanStack Query
+- Busca global na barra de navegação
 
 ---
 
@@ -132,6 +170,7 @@ atividade_rocketlab_dev/
 │   │   ├── database.py      # Configuração do SQLAlchemy
 │   │   ├── config.py        # Settings via pydantic-settings
 │   │   └── main.py          # App FastAPI + CORS
+│   ├── tests/               # Testes automatizados (pytest)
 │   ├── alembic/             # Migrações do banco
 │   └── requirements.txt
 ├── frontend/
@@ -141,6 +180,7 @@ atividade_rocketlab_dev/
 │   │   ├── services/        # Cliente Axios + chamadas à API
 │   │   ├── hooks/           # Custom hooks (useDebounce)
 │   │   ├── types/           # Interfaces TypeScript
+│   │   ├── utils/           # Utilitários (exportação CSV)
 │   │   └── main.tsx         # Entry point
 │   └── package.json
 └── dados/                   # CSVs de origem dos dados
@@ -152,9 +192,15 @@ atividade_rocketlab_dev/
 
 | Método | Rota | Descrição |
 |---|---|---|
-| `GET` | `/produtos` | Lista paginada com busca e filtro por categoria |
+| `GET` | `/produtos` | Lista paginada com busca, filtro e ordenação |
 | `GET` | `/produtos/{id}` | Detalhe com vendas e avaliações agregadas |
 | `POST` | `/produtos` | Criar produto |
-| `PUT` | `/produtos/{id}` | Atualizar produto (partial update) |
+| `PUT` | `/produtos/{id}` | Atualizar produto |
 | `DELETE` | `/produtos/{id}` | Remover produto |
-| `GET` | `/categorias` | Lista de categorias com imagem |
+| `GET` | `/categorias` | Lista de categorias |
+| `GET` | `/pedidos` | Lista paginada com filtro por status |
+| `GET` | `/pedidos/{id}` | Detalhe do pedido com itens e avaliações |
+| `GET` | `/consumidores` | Lista paginada com busca por nome |
+| `GET` | `/consumidores/{id}` | Perfil com histórico de pedidos |
+| `GET` | `/vendedores` | Lista paginada ordenada por receita |
+| `GET` | `/dashboard` | Agregações para o painel gerencial |
