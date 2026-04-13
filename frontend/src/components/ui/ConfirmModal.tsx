@@ -17,7 +17,6 @@ export default function ConfirmModal({
   onCancel,
   loading = false,
 }: Props) {
-  // fecha com Escape
   useEffect(() => {
     const handler = (e: KeyboardEvent) => e.key === "Escape" && onCancel();
     window.addEventListener("keydown", handler);

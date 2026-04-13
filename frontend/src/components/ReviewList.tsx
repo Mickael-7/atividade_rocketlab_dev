@@ -1,5 +1,9 @@
+import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import type { AvaliacaoStats } from "@/types";
 import StarRating from "@/components/StarRating";
+import { responderAvaliacao, removerRespostaAvaliacao } from "@/services/api";
 
 function RatingBar({ star, count, total }: { star: number; count: number; total: number }) {
   const pct = total > 0 ? Math.round((count / total) * 100) : 0;
@@ -20,14 +24,133 @@ function RatingBar({ star, count, total }: { star: number; count: number; total:
   );
 }
 
-interface Props {
-  stats: AvaliacaoStats;
+function ReviewItem({
+  av,
+  produtoId,
+}: {
+  av: AvaliacaoStats["avaliacoes"][number];
+  produtoId: string;
+}) {
+  const queryClient = useQueryClient();
+  const [editando, setEditando] = useState(false);
+  const [texto, setTexto] = useState(av.resposta_gerente ?? "");
+
+  const salvarMutation = useMutation({
+    mutationFn: () => responderAvaliacao(av.id_avaliacao, texto),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["produto", produtoId] });
+      toast.success("Resposta salva.");
+      setEditando(false);
+    },
+    onError: () => toast.error("Erro ao salvar resposta."),
+  });
+
+  const removerMutation = useMutation({
+    mutationFn: () => removerRespostaAvaliacao(av.id_avaliacao),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["produto", produtoId] });
+      toast.success("Resposta removida.");
+      setEditando(false);
+    },
+    onError: () => toast.error("Erro ao remover resposta."),
+  });
+
+  return (
+    <div className="py-4">
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <div className="h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-semibold text-sm shrink-0">
+            {av.avaliacao}
+          </div>
+          <div>
+            <StarRating value={av.avaliacao} size="sm" />
+            {av.titulo_comentario && av.titulo_comentario !== "Sem título" && (
+              <p className="text-sm font-medium text-gray-800 mt-0.5">{av.titulo_comentario}</p>
+            )}
+          </div>
+        </div>
+        {av.data_comentario && (
+          <time className="text-xs text-gray-400 shrink-0">
+            {new Date(av.data_comentario).toLocaleDateString("pt-BR")}
+          </time>
+        )}
+      </div>
+
+      {av.comentario && av.comentario !== "Sem comentário" && (
+        <p className="mt-2 text-sm text-gray-600 leading-relaxed pl-10">
+          {av.comentario}
+        </p>
+      )}
+
+      {/* resposta existente */}
+      {av.resposta_gerente && !editando && (
+        <div className="mt-3 ml-10 bg-indigo-50 border border-indigo-100 rounded-xl px-4 py-3">
+          <p className="text-xs font-semibold text-indigo-600 mb-1">Resposta da loja</p>
+          <p className="text-sm text-gray-700 leading-relaxed">{av.resposta_gerente}</p>
+          <div className="mt-2 flex gap-3">
+            <button
+              onClick={() => { setTexto(av.resposta_gerente ?? ""); setEditando(true); }}
+              className="text-xs text-indigo-600 hover:underline"
+            >
+              Editar
+            </button>
+            <button
+              onClick={() => removerMutation.mutate()}
+              disabled={removerMutation.isPending}
+              className="text-xs text-red-500 hover:underline disabled:opacity-50"
+            >
+              Remover
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* formulário de resposta */}
+      {editando ? (
+        <div className="mt-3 ml-10 space-y-2">
+          <textarea
+            value={texto}
+            onChange={(e) => setTexto(e.target.value)}
+            rows={3}
+            placeholder="Escreva a resposta da loja..."
+            className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+          />
+          <div className="flex gap-2">
+            <button
+              onClick={() => salvarMutation.mutate()}
+              disabled={salvarMutation.isPending || !texto.trim()}
+              className="px-3 py-1.5 text-xs font-medium bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition disabled:opacity-50"
+            >
+              {salvarMutation.isPending ? "Salvando..." : "Salvar"}
+            </button>
+            <button
+              onClick={() => setEditando(false)}
+              className="px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition"
+            >
+              Cancelar
+            </button>
+          </div>
+        </div>
+      ) : !av.resposta_gerente ? (
+        <button
+          onClick={() => { setTexto(""); setEditando(true); }}
+          className="mt-2 ml-10 text-xs text-indigo-500 hover:text-indigo-700 hover:underline transition-colors"
+        >
+          + Responder
+        </button>
+      ) : null}
+    </div>
+  );
 }
 
-export default function ReviewList({ stats }: Props) {
+interface Props {
+  stats: AvaliacaoStats;
+  produtoId: string;
+}
+
+export default function ReviewList({ stats, produtoId }: Props) {
   const { media_avaliacao, total_avaliacoes, avaliacoes } = stats;
 
-  // contagem por estrela
   const countByStar = [5, 4, 3, 2, 1].map((star) => ({
     star,
     count: avaliacoes.filter((a) => a.avaliacao === star).length,
@@ -69,32 +192,7 @@ export default function ReviewList({ stats }: Props) {
       {/* lista */}
       <div className="divide-y divide-gray-100">
         {avaliacoes.map((av) => (
-          <div key={av.id_avaliacao} className="py-4">
-            <div className="flex items-start justify-between gap-3">
-              <div className="flex items-center gap-2">
-                <div className="h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-semibold text-sm shrink-0">
-                  {av.avaliacao}
-                </div>
-                <div>
-                  <StarRating value={av.avaliacao} size="sm" />
-                  {av.titulo_comentario && av.titulo_comentario !== "Sem título" && (
-                    <p className="text-sm font-medium text-gray-800 mt-0.5">{av.titulo_comentario}</p>
-                  )}
-                </div>
-              </div>
-              {av.data_comentario && (
-                <time className="text-xs text-gray-400 shrink-0">
-                  {new Date(av.data_comentario).toLocaleDateString("pt-BR")}
-                </time>
-              )}
-            </div>
-
-            {av.comentario && av.comentario !== "Sem comentário" && (
-              <p className="mt-2 text-sm text-gray-600 leading-relaxed pl-10">
-                {av.comentario}
-              </p>
-            )}
-          </div>
+          <ReviewItem key={av.id_avaliacao} av={av} produtoId={produtoId} />
         ))}
       </div>
     </div>
