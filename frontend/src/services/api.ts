@@ -1,12 +1,20 @@
 import axios from "axios";
+import { toast } from "sonner";
 import type {
   Categoria,
+  ConsumidorDetail,
+  ConsumidorListResponse,
+  DashboardData,
+  PedidoDetail,
+  PedidoListResponse,
   ProdutoCreate,
   ProdutoDetail,
   ProdutoListParams,
   ProdutoListResponse,
   ProdutoUpdate,
   Produto,
+  Vendedor,
+  VendedorListResponse,
 } from "@/types";
 
 const api = axios.create({
@@ -14,7 +22,16 @@ const api = axios.create({
   headers: { "Content-Type": "application/json" },
 });
 
-// ─── Produtos ─────────────────────────────────────────────────────────────────
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const status = error.response?.status;
+    if (!status || status >= 500) {
+      toast.error("Erro no servidor. Tente novamente em instantes.");
+    }
+    return Promise.reject(error);
+  }
+);
 
 export async function getProdutos(
   params: ProdutoListParams = {}
@@ -45,9 +62,50 @@ export async function deletarProduto(id: string): Promise<void> {
   await api.delete(`/produtos/${id}`);
 }
 
-// ─── Categorias ───────────────────────────────────────────────────────────────
-
 export async function getCategorias(): Promise<Categoria[]> {
   const { data } = await api.get<Categoria[]>("/categorias");
   return data;
 }
+
+export async function getVendedores(params: { page?: number; limit?: number } = {}): Promise<VendedorListResponse> {
+  const { data } = await api.get<VendedorListResponse>("/vendedores", { params });
+  return data;
+}
+
+export async function getDashboard(): Promise<DashboardData> {
+  const { data } = await api.get<DashboardData>("/dashboard");
+  return data;
+}
+
+export async function getPedidos(params: { page?: number; limit?: number; status?: string } = {}): Promise<PedidoListResponse> {
+  const { data } = await api.get<PedidoListResponse>("/pedidos", { params });
+  return data;
+}
+
+export async function getPedido(id: string): Promise<PedidoDetail> {
+  const { data } = await api.get<PedidoDetail>(`/pedidos/${id}`);
+  return data;
+}
+
+export async function getConsumidores(params: { page?: number; limit?: number; busca?: string } = {}): Promise<ConsumidorListResponse> {
+  const { data } = await api.get<ConsumidorListResponse>("/consumidores", { params });
+  return data;
+}
+
+export async function getConsumidor(id: string): Promise<ConsumidorDetail> {
+  const { data } = await api.get<ConsumidorDetail>(`/consumidores/${id}`);
+  return data;
+}
+
+export async function responderAvaliacao(
+  id: string,
+  resposta: string
+): Promise<void> {
+  await api.patch(`/avaliacoes/${id}/resposta`, { resposta });
+}
+
+export async function removerRespostaAvaliacao(id: string): Promise<void> {
+  await api.delete(`/avaliacoes/${id}/resposta`);
+}
+
+export type { Vendedor };

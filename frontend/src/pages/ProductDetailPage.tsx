@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { getProduto, deletarProduto, getCategorias } from "@/services/api";
 import SalesStats from "@/components/SalesStats";
 import ReviewList from "@/components/ReviewList";
@@ -47,7 +48,11 @@ export default function ProductDetailPage() {
     mutationFn: () => deletarProduto(id!),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["produtos"] });
+      toast.success("Produto excluído com sucesso.");
       navigate("/", { replace: true });
+    },
+    onError: () => {
+      toast.error("Erro ao excluir produto. Tente novamente.");
     },
   });
 
@@ -168,7 +173,7 @@ export default function ProductDetailPage() {
             Avaliações dos Consumidores
           </h2>
           <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
-            <ReviewList stats={produto.avaliacoes} />
+            <ReviewList stats={produto.avaliacoes} produtoId={produto.id_produto} />
           </div>
         </section>
       </div>

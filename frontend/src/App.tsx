@@ -8,6 +8,12 @@ import NotFoundPage from "@/pages/NotFoundPage";
 const CatalogPage = lazy(() => import("@/pages/CatalogPage"));
 const ProductDetailPage = lazy(() => import("@/pages/ProductDetailPage"));
 const ProductFormPage = lazy(() => import("@/pages/ProductFormPage"));
+const DashboardPage = lazy(() => import("@/pages/DashboardPage"));
+const VendedoresPage = lazy(() => import("@/pages/VendedoresPage"));
+const PedidosPage = lazy(() => import("@/pages/PedidosPage"));
+const PedidoDetailPage = lazy(() => import("@/pages/PedidoDetailPage"));
+const ConsumidoresPage = lazy(() => import("@/pages/ConsumidoresPage"));
+const ConsumidorDetailPage = lazy(() => import("@/pages/ConsumidorDetailPage"));
 
 export default function App() {
   return (
@@ -18,6 +24,12 @@ export default function App() {
           <Suspense fallback={<LoadingSpinner fullPage />}>
             <Routes>
               <Route path="/" element={<CatalogPage />} />
+              <Route path="/dashboard" element={<DashboardPage />} />
+              <Route path="/vendedores" element={<VendedoresPage />} />
+              <Route path="/pedidos" element={<PedidosPage />} />
+              <Route path="/pedidos/:id" element={<PedidoDetailPage />} />
+              <Route path="/consumidores" element={<ConsumidoresPage />} />
+              <Route path="/consumidores/:id" element={<ConsumidorDetailPage />} />
               <Route path="/produtos/novo" element={<ProductFormPage />} />
               <Route path="/produtos/:id" element={<ProductDetailPage />} />
               <Route path="/produtos/:id/editar" element={<ProductFormPage />} />

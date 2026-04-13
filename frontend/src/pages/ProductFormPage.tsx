@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { getProduto, getCategorias, criarProduto, atualizarProduto } from "@/services/api";
 import FormField from "@/components/ui/FormField";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
@@ -88,21 +89,18 @@ export default function ProductFormPage() {
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitError, setSubmitError] = useState<string | null>(null);
 
-  // carrega produto existente ao editar
   const { data: produto, isLoading: loadingProduto } = useQuery({
     queryKey: ["produto", id],
     queryFn: () => getProduto(id!),
     enabled: isEditing,
   });
 
-  // categorias para o select
   const { data: categorias = [], isLoading: loadingCats } = useQuery({
     queryKey: ["categorias"],
     queryFn: getCategorias,
     staleTime: Infinity,
   });
 
-  // pré-popula o formulário quando os dados chegam
   useEffect(() => {
     if (produto) {
       setForm({
@@ -124,16 +122,17 @@ export default function ProductFormPage() {
     onSuccess: (saved) => {
       queryClient.invalidateQueries({ queryKey: ["produtos"] });
       if (isEditing) queryClient.invalidateQueries({ queryKey: ["produto", id] });
+      toast.success(isEditing ? "Produto atualizado com sucesso." : "Produto cadastrado com sucesso.");
       navigate(`/produtos/${saved.id_produto}`);
     },
     onError: () => {
       setSubmitError("Ocorreu um erro ao salvar o produto. Tente novamente.");
+      toast.error("Ocorreu um erro ao salvar o produto.");
     },
   });
 
   function handleChange(field: keyof FormData, value: string) {
     setForm((prev) => ({ ...prev, [field]: value }));
-    // limpa erro do campo ao digitar
     if (errors[field]) setErrors((prev) => ({ ...prev, [field]: undefined }));
     if (submitError) setSubmitError(null);
   }
