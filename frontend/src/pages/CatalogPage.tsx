@@ -83,11 +83,11 @@ export default function CatalogPage() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* cabeçalho */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Catálogo de Produtos</h1>
-        <p className="text-gray-500 text-sm mt-1">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Catálogo de Produtos</h1>
+        <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
           {data ? (
             <>
-              <span className="font-medium text-gray-700">
+              <span className="font-medium text-gray-700 dark:text-gray-300">
                 {data.total.toLocaleString("pt-BR")}
               </span>{" "}
               produtos encontrados
@@ -106,7 +106,7 @@ export default function CatalogPage() {
           <select
             value={ordenar}
             onChange={(e) => handleOrdenarChange(e.target.value)}
-            className="appearance-none h-full w-full sm:w-48 pl-3 pr-8 py-2.5 rounded-lg border border-gray-200 bg-white text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer"
+            className="appearance-none h-full w-full sm:w-48 pl-3 pr-8 py-2.5 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer"
           >
             {ORDENAR_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -125,7 +125,7 @@ export default function CatalogPage() {
       <div className="flex flex-wrap items-center gap-x-6 gap-y-2 mb-6">
         {/* mínima */}
         <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-500 shrink-0">Avaliação mínima:</span>
+          <span className="text-sm text-gray-500 dark:text-gray-400 shrink-0">Avaliação mínima:</span>
           <div className="flex items-center gap-1">
             {[1, 2, 3, 4, 5].map((star) => (
               <button
@@ -148,7 +148,7 @@ export default function CatalogPage() {
           {avaliacaoMin > 0 && (
             <button
               onClick={() => { setAvaliacaoMin(0); setPage(1); }}
-              className="text-xs text-gray-400 hover:text-gray-600 transition-colors"
+              className="text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
             >
               limpar
             </button>
@@ -157,7 +157,7 @@ export default function CatalogPage() {
 
         {/* máxima */}
         <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-500 shrink-0">Avaliação máxima:</span>
+          <span className="text-sm text-gray-500 dark:text-gray-400 shrink-0">Avaliação máxima:</span>
           <div className="flex items-center gap-1">
             {[1, 2, 3, 4, 5].map((star) => (
               <button
@@ -180,7 +180,7 @@ export default function CatalogPage() {
           {avaliacaoMax > 0 && (
             <button
               onClick={() => { setAvaliacaoMax(0); setPage(1); }}
-              className="text-xs text-gray-400 hover:text-gray-600 transition-colors"
+              className="text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
             >
               limpar
             </button>
@@ -190,7 +190,7 @@ export default function CatalogPage() {
 
       {/* aviso de filtro inválido */}
       {filtroInvalido && (
-        <div className="flex items-center gap-2 mb-6 px-4 py-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-700 text-sm">
+        <div className="flex items-center gap-2 mb-6 px-4 py-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 text-amber-700 dark:text-amber-300 text-sm">
           <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
           </svg>
@@ -220,7 +220,7 @@ export default function CatalogPage() {
             }`}
           >
             {data.items.length === 0 ? (
-              <div className="col-span-full flex flex-col items-center justify-center py-20 text-gray-400 gap-3">
+              <div className="col-span-full flex flex-col items-center justify-center py-20 text-gray-400 dark:text-gray-500 gap-3">
                 <svg className="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>

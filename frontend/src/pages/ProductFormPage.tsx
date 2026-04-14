@@ -74,10 +74,10 @@ function toPayload(data: FormData): ProdutoCreate {
 }
 
 const inputCls =
-  "w-full px-3 py-2.5 rounded-lg border border-gray-200 bg-white text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition";
+  "w-full px-3 py-2.5 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition";
 
 const inputErrCls =
-  "w-full px-3 py-2.5 rounded-lg border border-red-300 bg-red-50 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent transition";
+  "w-full px-3 py-2.5 rounded-lg border border-red-300 dark:border-red-700 bg-red-50 dark:bg-red-900/20 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent transition";
 
 export default function ProductFormPage() {
   const { id } = useParams<{ id: string }>();
@@ -152,8 +152,8 @@ export default function ProductFormPage() {
   return (
     <div className="max-w-2xl mx-auto px-4 sm:px-6 py-8">
       {/* breadcrumb */}
-      <nav className="flex items-center gap-2 text-sm text-gray-500 mb-6">
-        <Link to="/" className="hover:text-indigo-600 transition-colors">Catálogo</Link>
+      <nav className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mb-6">
+        <Link to="/" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Catálogo</Link>
         <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
         </svg>
@@ -161,7 +161,7 @@ export default function ProductFormPage() {
           <>
             <Link
               to={`/produtos/${id}`}
-              className="hover:text-indigo-600 transition-colors truncate max-w-[160px]"
+              className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors truncate max-w-[160px]"
             >
               {produto.nome_produto}
             </Link>
@@ -170,13 +170,13 @@ export default function ProductFormPage() {
             </svg>
           </>
         )}
-        <span className="text-gray-900 font-medium">
+        <span className="text-gray-900 dark:text-gray-100 font-medium">
           {isEditing ? "Editar" : "Novo Produto"}
         </span>
       </nav>
 
-      <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 sm:p-8">
-        <h1 className="text-xl font-bold text-gray-900 mb-6">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm p-6 sm:p-8">
+        <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-6">
           {isEditing ? "Editar Produto" : "Cadastrar Novo Produto"}
         </h1>
 
@@ -225,7 +225,7 @@ export default function ProductFormPage() {
 
           {/* dimensões */}
           <div>
-            <p className="text-sm font-medium text-gray-700 mb-3">
+            <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
               Especificações Físicas
               <span className="text-gray-400 font-normal ml-1">(opcionais)</span>
             </p>
@@ -281,12 +281,12 @@ export default function ProductFormPage() {
           </div>
 
           {/* ações */}
-          <div className="flex items-center justify-end gap-3 pt-2 border-t border-gray-100">
+          <div className="flex items-center justify-end gap-3 pt-2 border-t border-gray-100 dark:border-gray-700">
             <button
               type="button"
               onClick={() => navigate(isEditing ? `/produtos/${id}` : "/")}
               disabled={mutation.isPending}
-              className="px-5 py-2.5 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition disabled:opacity-50"
+              className="px-5 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition disabled:opacity-50"
             >
               Cancelar
             </button>

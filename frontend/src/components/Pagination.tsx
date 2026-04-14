@@ -26,16 +26,16 @@ export default function Pagination({ page, pages, total, limit, onChange }: Prop
 
   return (
     <div className="flex items-center justify-between flex-wrap gap-3 mt-8">
-      <p className="text-sm text-gray-500">
-        Mostrando <span className="font-medium text-gray-700">{from}–{to}</span> de{" "}
-        <span className="font-medium text-gray-700">{total.toLocaleString("pt-BR")}</span> produtos
+      <p className="text-sm text-gray-500 dark:text-gray-400">
+        Mostrando <span className="font-medium text-gray-700 dark:text-gray-300">{from}–{to}</span> de{" "}
+        <span className="font-medium text-gray-700 dark:text-gray-300">{total.toLocaleString("pt-BR")}</span> produtos
       </p>
 
       <nav className="flex items-center gap-1">
         <button
           onClick={() => onChange(page - 1)}
           disabled={page === 1}
-          className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition"
+          className="p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed transition"
           aria-label="Página anterior"
         >
           <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -45,7 +45,7 @@ export default function Pagination({ page, pages, total, limit, onChange }: Prop
 
         {getPages().map((p, i) =>
           p === "…" ? (
-            <span key={`ellipsis-${i}`} className="px-2 text-gray-400 select-none">…</span>
+            <span key={`ellipsis-${i}`} className="px-2 text-gray-400 dark:text-gray-500 select-none">…</span>
           ) : (
             <button
               key={p}
@@ -53,7 +53,7 @@ export default function Pagination({ page, pages, total, limit, onChange }: Prop
               className={`min-w-[36px] h-9 px-2 rounded-lg text-sm font-medium transition ${
                 p === page
                   ? "bg-indigo-600 text-white shadow-sm"
-                  : "text-gray-700 hover:bg-gray-100"
+                  : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
               }`}
             >
               {p}
@@ -64,7 +64,7 @@ export default function Pagination({ page, pages, total, limit, onChange }: Prop
         <button
           onClick={() => onChange(page + 1)}
           disabled={page === pages}
-          className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition"
+          className="p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed transition"
           aria-label="Próxima página"
         >
           <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

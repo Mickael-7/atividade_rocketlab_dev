@@ -24,10 +24,9 @@ export default function ProductCard({ produto }: Props) {
   return (
     <Link
       to={`/produtos/${produto.id_produto}`}
-      className="group bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex flex-col"
+      className="group bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex flex-col"
     >
-      {/* imagem da categoria */}
-      <div className="h-40 bg-gray-100 overflow-hidden">
+      <div className="h-40 bg-gray-100 dark:bg-gray-700 overflow-hidden">
         {imagem ? (
           <img
             src={imagem}
@@ -36,7 +35,7 @@ export default function ProductCard({ produto }: Props) {
             loading="lazy"
           />
         ) : (
-          <div className="h-full flex items-center justify-center text-gray-300">
+          <div className="h-full flex items-center justify-center text-gray-300 dark:text-gray-600">
             <svg className="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10" />
             </svg>
@@ -44,13 +43,12 @@ export default function ProductCard({ produto }: Props) {
         )}
       </div>
 
-      {/* conteúdo */}
       <div className="p-4 flex flex-col gap-2 flex-1">
-        <span className="inline-block self-start text-xs font-medium text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full">
+        <span className="inline-block self-start text-xs font-medium text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 px-2 py-0.5 rounded-full">
           {formatCategoria(produto.categoria_produto)}
         </span>
 
-        <h3 className="text-sm font-semibold text-gray-900 leading-snug line-clamp-2 group-hover:text-indigo-600 transition-colors">
+        <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 leading-snug line-clamp-2 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
           {produto.nome_produto}
         </h3>
 
@@ -58,11 +56,11 @@ export default function ProductCard({ produto }: Props) {
           {produto.media_avaliacao !== null ? (
             <StarRating value={produto.media_avaliacao} total={produto.total_avaliacoes} />
           ) : (
-            <span className="text-xs text-gray-400">Sem avaliações</span>
+            <span className="text-xs text-gray-400 dark:text-gray-500">Sem avaliações</span>
           )}
 
           {produto.peso_produto_gramas !== null && (
-            <span className="text-xs text-gray-400">
+            <span className="text-xs text-gray-400 dark:text-gray-500">
               {produto.peso_produto_gramas >= 1000
                 ? `${(produto.peso_produto_gramas / 1000).toFixed(1)} kg`
                 : `${produto.peso_produto_gramas} g`}

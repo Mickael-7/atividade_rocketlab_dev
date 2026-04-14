@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { useTheme } from "@/hooks/useTheme";
 
 const STORAGE_KEY = "ecm_sidebar_collapsed";
 
@@ -69,6 +70,7 @@ export default function Sidebar() {
   const [collapsed, setCollapsed] = useState(getInitialCollapsed);
   const navigate = useNavigate();
   const { logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
 
   function toggleCollapsed() {
     setCollapsed((prev) => {
@@ -81,25 +83,25 @@ export default function Sidebar() {
   const linkCls = ({ isActive }: { isActive: boolean }) =>
     `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
       isActive
-        ? "bg-indigo-50 text-indigo-600"
-        : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+        ? "bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400"
+        : "text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-100"
     }`;
 
   return (
     <aside
-      className={`flex flex-col h-screen sticky top-0 bg-white border-r border-gray-200 transition-all duration-300 shrink-0 ${
+      className={`flex flex-col h-screen sticky top-0 bg-white border-r border-gray-200 transition-all duration-300 shrink-0 dark:bg-gray-900 dark:border-gray-700 ${
         collapsed ? "w-[68px]" : "w-56"
       }`}
     >
       {/* logo + toggle */}
-      <div className={`flex items-center h-16 border-b border-gray-100 px-3 ${collapsed ? "justify-center" : "justify-between"}`}>
+      <div className={`flex items-center h-16 border-b border-gray-100 px-3 dark:border-gray-700 ${collapsed ? "justify-center" : "justify-between"}`}>
         {!collapsed && (
           <span className="text-base font-bold text-indigo-600 truncate">ROCKET MARKET</span>
         )}
         <button
           onClick={toggleCollapsed}
           title={collapsed ? "Expandir menu" : "Compactar menu"}
-          className="h-8 w-8 flex items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-900 transition-colors shrink-0"
+          className="h-8 w-8 flex items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-900 transition-colors shrink-0 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-100"
         >
           {collapsed ? (
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -132,7 +134,25 @@ export default function Sidebar() {
       </nav>
 
       {/* ações */}
-      <div className="border-t border-gray-100 py-3 px-2 space-y-0.5">
+      <div className="border-t border-gray-100 py-3 px-2 space-y-0.5 dark:border-gray-700">
+        {/* tema */}
+        <button
+          onClick={toggleTheme}
+          title={theme === "dark" ? "Modo claro" : "Modo escuro"}
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-100"
+        >
+          {theme === "dark" ? (
+            <svg className="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+            </svg>
+          ) : (
+            <svg className="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+            </svg>
+          )}
+          {!collapsed && <span className="truncate">{theme === "dark" ? "Modo Claro" : "Modo Escuro"}</span>}
+        </button>
+
         {/* novo produto */}
         <button
           onClick={() => navigate("/produtos/novo")}
@@ -149,7 +169,7 @@ export default function Sidebar() {
         <button
           onClick={logout}
           title={collapsed ? "Sair" : undefined}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:bg-red-50 hover:text-red-600 transition-colors"
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:bg-red-50 hover:text-red-600 transition-colors dark:text-gray-400 dark:hover:bg-red-900/20 dark:hover:text-red-400"
         >
           <svg className="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />

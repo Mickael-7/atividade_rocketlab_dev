@@ -6,7 +6,7 @@ export default function ErrorMessage({
   message = "Algo deu errado. Tente novamente.",
 }: Props) {
   return (
-    <div className="rounded-lg bg-red-50 border border-red-200 p-4 text-sm text-red-700 flex items-center gap-2">
+    <div className="rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-4 text-sm text-red-700 dark:text-red-400 flex items-center gap-2">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         className="h-5 w-5 shrink-0"

@@ -4,13 +4,13 @@ interface Props {
 
 export function Skeleton({ className = "" }: Props) {
   return (
-    <div className={`animate-pulse bg-gray-200 rounded-lg ${className}`} />
+    <div className={`animate-pulse bg-gray-200 dark:bg-gray-700 rounded-lg ${className}`} />
   );
 }
 
 export function ProductCardSkeleton() {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm flex flex-col">
+    <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm flex flex-col">
       <Skeleton className="h-40 rounded-none" />
       <div className="p-4 flex flex-col gap-3">
         <Skeleton className="h-4 w-24 rounded-full" />
@@ -29,7 +29,7 @@ export function ProductDetailSkeleton() {
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       <Skeleton className="h-4 w-48" />
-      <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden p-6 flex gap-6">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden p-6 flex gap-6">
         <Skeleton className="h-56 w-72 rounded-xl shrink-0" />
         <div className="flex-1 space-y-4">
           <Skeleton className="h-4 w-24 rounded-full" />

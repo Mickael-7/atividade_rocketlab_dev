@@ -28,7 +28,7 @@ export default function App() {
         <Route
           path="/*"
           element={
-            <div className="min-h-screen bg-gray-50 flex flex-row">
+            <div className="min-h-screen bg-gray-50 flex flex-row dark:bg-gray-900">
               <Sidebar />
               <main className="flex-1 overflow-auto">
                 <ErrorBoundary>
