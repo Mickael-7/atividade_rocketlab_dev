@@ -14,7 +14,7 @@ router = APIRouter(prefix="/vendedores", tags=["Vendedores"])
 @router.get("", response_model=VendedorListResponse)
 def listar_vendedores(
     page: int = Query(1, ge=1),
-    limit: int = Query(20, ge=1, le=100),
+    limit: int = Query(20, ge=1, le=10000),
     db: Session = Depends(get_db),
 ):
     stats_sq = (
