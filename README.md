@@ -94,6 +94,14 @@ pytest
 ```env
 DATABASE_URL=sqlite:///./database.db
 ALLOWED_ORIGINS=["http://localhost:5173","http://localhost:5174"]
+
+# Credenciais do administrador (acesso ao painel)
+ADMIN_EMAIL=gerente@loja.com
+ADMIN_PASSWORD=senha123
+
+# JWT
+JWT_SECRET=troque-por-uma-chave-segura-em-producao
+JWT_EXPIRE_MINUTES=480
 ```
 
 ### Frontend (`frontend/.env.local`)
@@ -108,10 +116,17 @@ VITE_API_URL=http://localhost:8000
 
 ## Funcionalidades
 
+### Autenticação (`/login`)
+- Login com email e senha (credenciais configuradas no `.env`)
+- JWT com expiração configurável
+- Rotas protegidas — redireciona para `/login` automaticamente
+- Logout pela sidebar
+
 ### Catálogo de Produtos (`/`)
 - Grid responsivo com imagem representativa da categoria
 - Busca por nome com debounce e sincronização com URL
-- Filtro por categoria e avaliação mínima (estrelas)
+- Filtro por categoria, avaliação mínima e avaliação máxima (estrelas)
+- Aviso quando o filtro mínimo > máximo (evita requisição inválida)
 - Ordenação por nome, mais vendidos e melhor avaliados
 - Média de avaliações exibida em cada card
 - Paginação com navegação por ellipsis
@@ -120,6 +135,7 @@ VITE_API_URL=http://localhost:8000
 - Especificações: peso, comprimento, altura e largura
 - Desempenho de vendas: unidades vendidas, receita total e preço médio
 - Avaliações: média geral, distribuição por estrela e lista de comentários
+- Resposta da loja por avaliação (criar, editar e remover)
 - Ações: editar e excluir (com modal de confirmação)
 
 ### Gerenciamento de Produtos
@@ -138,7 +154,7 @@ VITE_API_URL=http://localhost:8000
 
 ### Vendedores (`/vendedores`)
 - Listagem paginada ordenada por receita
-- Exportação para CSV
+- Exportação para CSV (todos os registros)
 
 ### Dashboard (`/dashboard`)
 - KPIs: total de pedidos, receita total, ticket médio e % de entregas no prazo
@@ -149,11 +165,13 @@ VITE_API_URL=http://localhost:8000
 - Indicador de pontualidade de entrega
 - Exportação dos top produtos para CSV
 
-### Outros recursos
+### Interface
+- Sidebar colapsável com ícones (estado persistido no localStorage)
+- Tema claro / escuro com toggle na sidebar (persistido no localStorage)
+- Detecção automática de `prefers-color-scheme` no primeiro acesso
 - Notificações toast em erros e ações (sonner)
-- Interceptor global de erros HTTP (Axios)
+- Interceptor global de erros HTTP com redirecionamento em caso de 401
 - Caching de consultas com TanStack Query
-- Busca global na barra de navegação
 
 ---
 
@@ -176,9 +194,10 @@ atividade_rocketlab_dev/
 ├── frontend/
 │   ├── src/
 │   │   ├── components/      # Componentes reutilizáveis
+│   │   │   └── ui/          # Primitivos genéricos (FormField, Modal, Skeleton…)
 │   │   ├── pages/           # Páginas (rotas)
 │   │   ├── services/        # Cliente Axios + chamadas à API
-│   │   ├── hooks/           # Custom hooks (useDebounce)
+│   │   ├── hooks/           # Custom hooks (useDebounce, useTheme, useAuth)
 │   │   ├── types/           # Interfaces TypeScript
 │   │   ├── utils/           # Utilitários (exportação CSV)
 │   │   └── main.tsx         # Entry point
@@ -190,17 +209,20 @@ atividade_rocketlab_dev/
 
 ## Endpoints da API
 
-| Método | Rota | Descrição |
-|---|---|---|
-| `GET` | `/produtos` | Lista paginada com busca, filtro e ordenação |
-| `GET` | `/produtos/{id}` | Detalhe com vendas e avaliações agregadas |
-| `POST` | `/produtos` | Criar produto |
-| `PUT` | `/produtos/{id}` | Atualizar produto |
-| `DELETE` | `/produtos/{id}` | Remover produto |
-| `GET` | `/categorias` | Lista de categorias |
-| `GET` | `/pedidos` | Lista paginada com filtro por status |
-| `GET` | `/pedidos/{id}` | Detalhe do pedido com itens e avaliações |
-| `GET` | `/consumidores` | Lista paginada com busca por nome |
-| `GET` | `/consumidores/{id}` | Perfil com histórico de pedidos |
-| `GET` | `/vendedores` | Lista paginada ordenada por receita |
-| `GET` | `/dashboard` | Agregações para o painel gerencial |
+| Método | Rota | Auth | Descrição |
+|---|---|---|---|
+| `POST` | `/auth/login` | — | Autenticação, retorna JWT |
+| `GET` | `/produtos` | — | Lista paginada com busca, filtro e ordenação |
+| `GET` | `/produtos/{id}` | — | Detalhe com vendas e avaliações agregadas |
+| `POST` | `/produtos` | JWT | Criar produto |
+| `PUT` | `/produtos/{id}` | JWT | Atualizar produto |
+| `DELETE` | `/produtos/{id}` | JWT | Remover produto |
+| `GET` | `/categorias` | — | Lista de categorias |
+| `PATCH` | `/avaliacoes/{id}/resposta` | JWT | Adicionar/editar resposta da loja |
+| `DELETE` | `/avaliacoes/{id}/resposta` | JWT | Remover resposta da loja |
+| `GET` | `/pedidos` | — | Lista paginada com filtro por status |
+| `GET` | `/pedidos/{id}` | — | Detalhe do pedido com itens e avaliações |
+| `GET` | `/consumidores` | — | Lista paginada com busca por nome |
+| `GET` | `/consumidores/{id}` | — | Perfil com histórico de pedidos |
+| `GET` | `/vendedores` | — | Lista paginada ordenada por receita |
+| `GET` | `/dashboard` | — | Agregações para o painel gerencial |
