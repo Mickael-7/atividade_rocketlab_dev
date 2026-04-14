@@ -1,6 +1,6 @@
 import { Routes, Route } from "react-router-dom";
 import { Suspense, lazy } from "react";
-import Header from "@/components/Header";
+import Sidebar from "@/components/Sidebar";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
@@ -28,9 +28,9 @@ export default function App() {
         <Route
           path="/*"
           element={
-            <div className="min-h-screen bg-gray-50 flex flex-col">
-              <Header />
-              <main className="flex-1">
+            <div className="min-h-screen bg-gray-50 flex flex-row">
+              <Sidebar />
+              <main className="flex-1 overflow-auto">
                 <ErrorBoundary>
                   <Suspense fallback={<LoadingSpinner fullPage />}>
                     <Routes>
