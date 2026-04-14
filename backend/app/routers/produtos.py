@@ -55,6 +55,7 @@ def listar_produtos(
     categoria: str = Query("", alias="categoria"),
     ordenar: str = Query("", alias="ordenar"),
     avaliacao_min: int = Query(0, ge=0, le=5, alias="avaliacao_min"),
+    avaliacao_max: int = Query(0, ge=0, le=5, alias="avaliacao_max"),
     db: Session = Depends(get_db),
 ):
     query = select(Produto)
@@ -65,12 +66,18 @@ def listar_produtos(
     if categoria.strip():
         query = query.where(Produto.categoria_produto == categoria.strip())
 
-    if avaliacao_min > 0:
+    if avaliacao_min > 0 or avaliacao_max > 0:
+        having_clauses = []
+        if avaliacao_min > 0:
+            having_clauses.append(func.avg(AvaliacaoPedido.avaliacao) >= avaliacao_min)
+        if avaliacao_max > 0:
+            having_clauses.append(func.avg(AvaliacaoPedido.avaliacao) <= avaliacao_max)
+
         aval_filter_sq = (
             select(ItemPedido.id_produto)
             .join(AvaliacaoPedido, AvaliacaoPedido.id_pedido == ItemPedido.id_pedido)
             .group_by(ItemPedido.id_produto)
-            .having(func.avg(AvaliacaoPedido.avaliacao) >= avaliacao_min)
+            .having(*having_clauses)
             .subquery()
         )
         query = query.join(aval_filter_sq, Produto.id_produto == aval_filter_sq.c.id_produto)

@@ -33,6 +33,7 @@ export default function CatalogPage() {
   const [categoria, setCategoria] = useState("");
   const [ordenar, setOrdenar] = useState("");
   const [avaliacaoMin, setAvaliacaoMin] = useState(0);
+  const [avaliacaoMax, setAvaliacaoMax] = useState(0);
 
   const debouncedBusca = useDebounce(busca, 400);
 
@@ -43,11 +44,14 @@ export default function CatalogPage() {
     setSearchParams(params, { replace: true });
   }, [debouncedBusca]);
 
+  const filtroInvalido = avaliacaoMin > 0 && avaliacaoMax > 0 && avaliacaoMin > avaliacaoMax;
+
   const { data, isLoading, isError, isFetching } = useQuery({
-    queryKey: ["produtos", page, debouncedBusca, categoria, ordenar, avaliacaoMin],
+    queryKey: ["produtos", page, debouncedBusca, categoria, ordenar, avaliacaoMin, avaliacaoMax],
     queryFn: () =>
-      getProdutos({ page, limit: LIMIT, busca: debouncedBusca, categoria, ordenar, avaliacao_min: avaliacaoMin || undefined }),
+      getProdutos({ page, limit: LIMIT, busca: debouncedBusca, categoria, ordenar, avaliacao_min: avaliacaoMin || undefined, avaliacao_max: avaliacaoMax || undefined }),
     placeholderData: (prev) => prev,
+    enabled: !filtroInvalido,
   });
 
   function handleBuscaChange(value: string) {
@@ -67,6 +71,11 @@ export default function CatalogPage() {
 
   function handleAvaliacaoMin(value: number) {
     setAvaliacaoMin((prev) => (prev === value ? 0 : value));
+    setPage(1);
+  }
+
+  function handleAvaliacaoMax(value: number) {
+    setAvaliacaoMax((prev) => (prev === value ? 0 : value));
     setPage(1);
   }
 
@@ -112,38 +121,82 @@ export default function CatalogPage() {
         </div>
       </div>
 
-      {/* filtro de avaliação mínima — linha 2 */}
-      <div className="flex items-center gap-2 mb-6">
-        <span className="text-sm text-gray-500 shrink-0">Avaliação mínima:</span>
-        <div className="flex items-center gap-1">
-          {[1, 2, 3, 4, 5].map((star) => (
-            <button
-              key={star}
-              onClick={() => handleAvaliacaoMin(star)}
-              title={`${star} estrela${star > 1 ? "s" : ""} ou mais`}
-              className="focus:outline-none"
-            >
-              <svg
-                className={`h-5 w-5 transition-colors ${
-                  star <= avaliacaoMin ? "text-amber-400" : "text-gray-300 hover:text-amber-300"
-                }`}
-                viewBox="0 0 20 20"
-                fill="currentColor"
+      {/* filtros de avaliação — linha 2 */}
+      <div className="flex flex-wrap items-center gap-x-6 gap-y-2 mb-6">
+        {/* mínima */}
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-gray-500 shrink-0">Avaliação mínima:</span>
+          <div className="flex items-center gap-1">
+            {[1, 2, 3, 4, 5].map((star) => (
+              <button
+                key={star}
+                onClick={() => handleAvaliacaoMin(star)}
+                title={`${star} estrela${star > 1 ? "s" : ""} ou mais`}
+                className="focus:outline-none"
               >
-                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-              </svg>
+                <svg
+                  className={`h-5 w-5 transition-colors ${
+                    star <= avaliacaoMin ? "text-amber-400" : "text-gray-300 hover:text-amber-300"
+                  }`}
+                  viewBox="0 0 20 20" fill="currentColor"
+                >
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                </svg>
+              </button>
+            ))}
+          </div>
+          {avaliacaoMin > 0 && (
+            <button
+              onClick={() => { setAvaliacaoMin(0); setPage(1); }}
+              className="text-xs text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              limpar
             </button>
-          ))}
+          )}
         </div>
-        {avaliacaoMin > 0 && (
-          <button
-            onClick={() => { setAvaliacaoMin(0); setPage(1); }}
-            className="text-xs text-gray-400 hover:text-gray-600 transition-colors ml-1"
-          >
-            limpar
-          </button>
-        )}
+
+        {/* máxima */}
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-gray-500 shrink-0">Avaliação máxima:</span>
+          <div className="flex items-center gap-1">
+            {[1, 2, 3, 4, 5].map((star) => (
+              <button
+                key={star}
+                onClick={() => handleAvaliacaoMax(star)}
+                title={`até ${star} estrela${star > 1 ? "s" : ""}`}
+                className="focus:outline-none"
+              >
+                <svg
+                  className={`h-5 w-5 transition-colors ${
+                    star <= avaliacaoMax ? "text-indigo-400" : "text-gray-300 hover:text-indigo-300"
+                  }`}
+                  viewBox="0 0 20 20" fill="currentColor"
+                >
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                </svg>
+              </button>
+            ))}
+          </div>
+          {avaliacaoMax > 0 && (
+            <button
+              onClick={() => { setAvaliacaoMax(0); setPage(1); }}
+              className="text-xs text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              limpar
+            </button>
+          )}
+        </div>
       </div>
+
+      {/* aviso de filtro inválido */}
+      {filtroInvalido && (
+        <div className="flex items-center gap-2 mb-6 px-4 py-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-700 text-sm">
+          <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+          </svg>
+          A avaliação mínima ({avaliacaoMin}★) não pode ser maior que a máxima ({avaliacaoMax}★). Ajuste os filtros para ver os resultados.
+        </div>
+      )}
 
       {/* skeleton no carregamento inicial */}
       {isLoading && (

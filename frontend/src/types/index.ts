@@ -36,6 +36,7 @@ export interface ProdutoListParams {
   categoria?: string;
   ordenar?: string;
   avaliacao_min?: number;
+  avaliacao_max?: number;
 }
 
 export interface VendasStats {
