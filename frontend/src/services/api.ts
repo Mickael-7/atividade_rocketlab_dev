@@ -1,5 +1,6 @@
 import axios from "axios";
 import { toast } from "sonner";
+import { clearToken, getToken } from "@/hooks/useAuth";
 import type {
   Categoria,
   ConsumidorDetail,
@@ -22,10 +23,21 @@ const api = axios.create({
   headers: { "Content-Type": "application/json" },
 });
 
+api.interceptors.request.use((config) => {
+  const token = getToken();
+  if (token) config.headers.Authorization = `Bearer ${token}`;
+  return config;
+});
+
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     const status = error.response?.status;
+    if (status === 401) {
+      clearToken();
+      window.location.href = "/login";
+      return Promise.reject(error);
+    }
     if (!status || status >= 500) {
       toast.error("Erro no servidor. Tente novamente em instantes.");
     }
@@ -94,6 +106,14 @@ export async function getConsumidores(params: { page?: number; limit?: number; b
 
 export async function getConsumidor(id: string): Promise<ConsumidorDetail> {
   const { data } = await api.get<ConsumidorDetail>(`/consumidores/${id}`);
+  return data;
+}
+
+export async function login(username: string, password: string): Promise<{ access_token: string }> {
+  const form = new URLSearchParams({ username, password });
+  const { data } = await api.post<{ access_token: string }>("/auth/login", form, {
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+  });
   return data;
 }
 

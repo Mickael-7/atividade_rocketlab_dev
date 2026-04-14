@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
+from app.auth import get_current_user
 from app.database import get_db
 from app.models import Produto, ItemPedido, AvaliacaoPedido
 from app.schemas.produto import (
@@ -188,7 +189,7 @@ def detalhar_produto(id_produto: str, db: Session = Depends(get_db)):
 
 
 @router.post("", response_model=ProdutoResponse, status_code=201)
-def criar_produto(payload: ProdutoCreate, db: Session = Depends(get_db)):
+def criar_produto(payload: ProdutoCreate, db: Session = Depends(get_db), _: str = Depends(get_current_user)):
     produto = Produto(id_produto=uuid.uuid4().hex, **payload.model_dump())
     db.add(produto)
     db.commit()
@@ -198,7 +199,7 @@ def criar_produto(payload: ProdutoCreate, db: Session = Depends(get_db)):
 
 @router.put("/{id_produto}", response_model=ProdutoResponse)
 def atualizar_produto(
-    id_produto: str, payload: ProdutoUpdate, db: Session = Depends(get_db)
+    id_produto: str, payload: ProdutoUpdate, db: Session = Depends(get_db), _: str = Depends(get_current_user)
 ):
     produto = db.get(Produto, id_produto)
     if not produto:
@@ -213,7 +214,7 @@ def atualizar_produto(
 
 
 @router.delete("/{id_produto}", status_code=204)
-def deletar_produto(id_produto: str, db: Session = Depends(get_db)):
+def deletar_produto(id_produto: str, db: Session = Depends(get_db), _: str = Depends(get_current_user)):
     produto = db.get(Produto, id_produto)
     if not produto:
         raise HTTPException(status_code=404, detail="Produto não encontrado")

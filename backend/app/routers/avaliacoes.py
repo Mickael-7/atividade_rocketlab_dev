@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
+from app.auth import get_current_user
 from app.database import get_db
 from app.models import AvaliacaoPedido
 
@@ -17,6 +18,7 @@ def responder_avaliacao(
     id_avaliacao: str,
     payload: RespostaPayload,
     db: Session = Depends(get_db),
+    _: str = Depends(get_current_user),
 ):
     avaliacao = db.get(AvaliacaoPedido, id_avaliacao)
     if not avaliacao:
@@ -31,6 +33,7 @@ def responder_avaliacao(
 def remover_resposta(
     id_avaliacao: str,
     db: Session = Depends(get_db),
+    _: str = Depends(get_current_user),
 ):
     avaliacao = db.get(AvaliacaoPedido, id_avaliacao)
     if not avaliacao:
